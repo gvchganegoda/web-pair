@@ -4,10 +4,10 @@ router.get('/', async (req, res) => {
         return res.status(400).json({ error: "Invalid number" });
     }
 
-    async function GV_BudPair() {
+    async function gvbudPair() {
         const { state, saveCreds } = await useMultiFileAuthState(`./session`);
         try {
-            let GV_BudPairWeb = makeWASocket({
+            let gvbudPairWeb = makeWASocket({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -17,14 +17,14 @@ router.get('/', async (req, res) => {
                 browser: Browsers.macOS("Safari"),
             });
 
-            if (!GV_BudPairWeb.authState.creds.registered) {
+            if (!gvbudPairWeb.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
-                const code = await GV_BudPairWeb.requestPairingCode(num);
+                const code = await gvbudPairWeb.requestPairingCode(num);
                 if (!res.headersSent) res.send({ code });
             }
 
-            GV_BudPairWeb.ev.on('creds.update', saveCreds);
+            gvbudPairWeb.ev.on('creds.update', saveCreds);
             // …connection.update handler…
         } catch (err) {
             console.error("Service error", err);
@@ -32,5 +32,5 @@ router.get('/', async (req, res) => {
         }
     }
 
-    return await GV_BudPair();
+    return await gvbudPair();
 });
